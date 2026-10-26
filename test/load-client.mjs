@@ -3,7 +3,6 @@
  * 不启动浏览器：用 test/dom.mjs 的最小 DOM 垫片，只调用纯函数/渲染函数。
  */
 import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { runInNewContext } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
