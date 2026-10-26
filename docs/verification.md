@@ -162,14 +162,31 @@ dsh --profile web --port 3942 --host 127.0.0.1 --no-open
 ## 5. P5 打磨
 
 - 键盘：评论 textarea 中 `Enter` 提交（`keyEnter.count=1`、barVisible=false、dock 出现「键盘提交的批注」）。
-- 深/浅主题（`docs/screenshots/dark-theme.png`）：
+- 主色整改：全部改用 DeepSeek 蓝 token，不再使用 `--dsw-alias-brand-primary`（该 token 浅色实际为 #0f1115 近黑）：
+  - 浅色：`--dsw-static-deepseek-500` = #4176e6；深色：`--dsw-static-deepseek-450` = #5686fe。
+  - 浅底：`--dsw-alias-state-business-tertiary`（浅 #e4edfd / 深 #34415b）；hover：`--dsw-alias-button-info-hover`。
+- 圆角/卡片：评论浮层与引用区卡片均为 `var(--dsw-radius-panel)` = 28px；消息引用卡为 `var(--dsw-radius-lg)` = 16px。
+- 深/浅色 computed（`docs/screenshots/design-light.png` / `design-dark.png`，引用区 + 评论浮层 + 消息引用卡同框）：
 
 ```json
 {
-  "light": { "bg": "rgb(255, 255, 255)", "color": "rgb(15, 17, 21)", "border": "1px rgba(0, 0, 0, 0.04)" },
-  "dark":  { "bg": "rgb(35, 35, 36)",   "color": "rgb(249, 250, 251)", "border": "1px rgba(255, 255, 255, 0.06)" }
+  "light": {
+    "commentBarRadius": "28px", "commentBoxRadius": "28px", "dockRadius": "28px",
+    "numBg": "rgb(65, 118, 230)", "confirmBg": "rgb(65, 118, 230)",
+    "quoteRadius": "16px", "quoteLeftBorder": "2px rgb(65, 118, 230)",
+    "quoteBodyFont": "13px/20px", "quoteHeadFont": "12px/18px"
+  },
+  "dark": {
+    "commentBarRadius": "28px", "commentBoxRadius": "28px", "dockRadius": "28px",
+    "numBg": "rgb(86, 134, 254)", "confirmBg": "rgb(86, 134, 254)",
+    "quoteRadius": "16px", "quoteLeftBorder": "2px rgb(86, 134, 254)",
+    "quoteBodyFont": "13px/20px", "quoteHeadFont": "12px/18px"
+  }
 }
 ```
+
+- 多引用回归：`test/render.mjs` 构造「一条消息连续 3 段引用 + 其中一段无批注/无 ref」，断言 3 张引用卡、原始 run 被隐藏、每张卡都不含 `qc1:` / `※`；当前 DOM 断言 20 组全绿。
+- 真实页面多引用回归（`docs/screenshots/multi-quote-real.png`）：引用区 3 条 → 发送后消息内 3 张引用卡，`hasQc1=false`、`hasTransmission=false`，pageErrors=[]；第三条无批注、第二条带批注。
 
 - 长文本：引用区单行 `text-overflow:ellipsis`；消息内引用块 `-webkit-line-clamp:4`，点击展开。
 - 错误态：`jumpToAnchor(..., {key:'missing-key'}, ...)` 返回 false，toast 为「原文已变，无法定位」。
@@ -185,9 +202,9 @@ OK  manifest: dsh-quote-context@0.1.0
 OK  exports : . ./client ./package.json ./locale/*.json
 OK  patch   : quote-context / dsh-quote-context
 OK  locale  : 26 keys (zh/en aligned)
-OK  bundle  : 71089 chars, key markers present
+OK  bundle  : 72769 chars, key markers present
 OK  线格式/坐标断言: 8 组
-OK  消息内引用卡断言: 7 组
+OK  消息内引用卡断言: 20 组
 ```
 
 `node --check lib/index.js` / `node --check lib/client.js` 均通过。
@@ -233,7 +250,10 @@ error: profile "desktop" is managed exclusively by the Electron application
 - `docs/screenshots/selection-bar.png` — P2 浮条
 - `docs/screenshots/quote-dock.png` — P3 引用区
 - `docs/screenshots/message-quote.png` — P4 消息内引用块
-- `docs/screenshots/dark-theme.png` — P5 深色
+- `docs/screenshots/dark-theme.png` — P5 深色（旧）
+- `docs/screenshots/design-light.png` — 设计整改浅色（引用区 + 评论浮层 + 消息引用卡）
+- `docs/screenshots/design-dark.png` — 设计整改深色
+- `docs/screenshots/multi-quote-real.png` — 真实页面 3 段连续引用
 - `docs/screenshots/final-e2e.png` — 最终 E2E
 - `docs/screenshots/p1-page.png` — P1 空壳页面
 - `_tmp/p2-evidence.json`、`_tmp/final-e2e.json`（项目根临时证据，不随包发布）
