@@ -252,3 +252,12 @@ web 实例（独立端口，不碰桌面端）：
 dsh --profile web --port 3942 --host 127.0.0.1 --no-open
 # 用打印出的 ?token=... URL 打开
 ```
+
+## 11. 交付状态
+
+- 本地 git 仓库已初始化，提交记录：
+  - `cc4a3f0` feat: 新增 dsh-quote-context 聊天引用插件
+  - `e32356a` chore: 补充仓库元数据与测试断言
+- 工作区 clean（`git status --short` 为空）。
+- GitHub 推送：**未完成**。本机 `gh auth status` 报 token invalid，且直连/代理访问 `api.github.com` 均返回 EOF；已尝试 `gh repo create dsh-quote-context --public --source . --push` 失败。需要用户重新 `gh auth login` 或提供可用网络后再推送。
+- desktop profile：**未安装、未修改**，只做了文件级检查；实际安装/重启桌面端需先征得用户同意。
