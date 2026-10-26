@@ -185,7 +185,7 @@ OK  manifest: dsh-quote-context@0.1.0
 OK  exports : . ./client ./package.json ./locale/*.json
 OK  patch   : quote-context / dsh-quote-context
 OK  locale  : 26 keys (zh/en aligned)
-OK  bundle  : 71181 chars, key markers present
+OK  bundle  : 71089 chars, key markers present
 OK  线格式/坐标断言: 8 组
 OK  消息内引用卡断言: 7 组
 ```
