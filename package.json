@@ -50,5 +50,13 @@
 		"client": {
 			"platform": "web"
 		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Yhx888/dsh-quote-context.git"
+	},
+	"homepage": "https://github.com/Yhx888/dsh-quote-context#readme",
+	"bugs": {
+		"url": "https://github.com/Yhx888/dsh-quote-context/issues"
 	}
 }
