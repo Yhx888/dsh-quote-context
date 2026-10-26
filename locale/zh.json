@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "title": "聊天引用",
+    "description": "选中消息文字即可引用或评论；引用常驻输入卡上方，发送后变成可跳回的引用块。"
+  },
+  "quote": "引用",
+  "comment": "评论",
+  "quoteLabel": "引用",
+  "commentPlaceholder": "写一条批注（可选）…",
+  "addToChat": "添加到对话",
+  "cancel": "取消",
+  "confirm": "添加",
+  "dockTitle": "引用",
+  "dockCount": "{n} 条",
+  "dockClear": "清空",
+  "edit": "编辑批注",
+  "save": "保存",
+  "remove": "移除这条引用",
+  "quoteMeta": "{lines} 行",
+  "sourceFrom": "引用自先前的消息",
+  "showSource": "在原消息中显示",
+  "sourceLost": "原文已变，无法定位",
+  "jumpFailed": "原文不在当前视图里",
+  "failed": "操作失败，请重试",
+  "commentEmpty": "写一句批注再添加",
+  "dockEditPlaceholder": "写一条批注…",
+  "quoteTooLong": "引用太长，已截断到 {n} 字",
+  "emptyQuote": "没有可引用的文字",
+  "expand": "展开",
+  "collapse": "收起"
+}

@@ -1,0 +1,54 @@
+{
+	"name": "dsh-quote-context",
+	"version": "0.1.0",
+	"description": "聊天引用：选中消息文字即可引用或评论，引用常驻输入卡上方，发送后变成可跳回的引用块。",
+	"icon": "icon.svg",
+	"license": "MIT",
+	"author": "YHX",
+	"keywords": [
+		"dsh",
+		"dsh-plugin",
+		"deepseek-harness",
+		"quote",
+		"selection",
+		"annotation"
+	],
+	"type": "module",
+	"main": "lib/index.js",
+	"engines": {
+		"dsh": ">=0.2.0-rc.2",
+		"node": ">=18"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"exports": {
+		".": "./lib/index.js",
+		"./client": "./lib/client.js",
+		"./package.json": "./package.json",
+		"./locale/*.json": "./locale/*.json"
+	},
+	"files": [
+		"icon.svg",
+		"lib",
+		"locale",
+		"test",
+		"docs",
+		"cordis.patch.yml",
+		"README.md",
+		"CHANGELOG.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"test": "node test/check.mjs && node test/quote.mjs && node test/render.mjs"
+	},
+	"dsh": {
+		"manifestVersion": 1,
+		"bundle": {
+			"patch": "./cordis.patch.yml"
+		},
+		"client": {
+			"platform": "web"
+		}
+	}
+}

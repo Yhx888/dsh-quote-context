@@ -1,0 +1,8 @@
+# dsh-quote-context 的 bundle 层。
+#
+# 作为 profile bundle 安装时（dsh plugin --profile <name> add link:<包目录>），
+# 下面这行把插件插入 Loader；手工安装时也可以把同一行追加到 profile 自己的
+# cordis.patch.yml。Host 半是空壳，不需要声明 inject 硬依赖。
+- insert:
+    - id: quote-context
+      name: dsh-quote-context

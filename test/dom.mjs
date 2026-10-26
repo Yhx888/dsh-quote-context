@@ -1,0 +1,537 @@
+/**
+ * 最小 DOM 垫片，借自 dsh-quote-deck 的 test/dom.mjs（MIT）。
+ * 只实现引用块渲染/选区测试用到的那一小片 DOM；不引入浏览器或依赖。
+ */
+
+/**
+ * A very small DOM, just enough to run the transcript capsule enhancer.
+ *
+ * The capsule code touches a narrow slice of the DOM: element and text nodes,
+ * class/attribute/dataset/style, insertBefore/remove, closest and the two
+ * query selectors, plus a MutationObserver and a Map-backed localStorage.
+ * Implementing that slice keeps the enhancer testable with plain `node` — no
+ * browser, no dependencies — while a real browser still gets the real thing.
+ *
+ * Supported selectors: tag, `*`, `.class`, `#id`, `[attr]`, `[attr="value"]`,
+ * and descendant combinators between them.
+ */
+
+const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
+const DOCUMENT_FRAGMENT_NODE = 11;
+
+class ShimNode {
+	constructor(nodeType) {
+		this.nodeType = nodeType;
+		this.parentNode = null;
+		this.childNodes = [];
+	}
+
+	get parentElement() {
+		return this.parentNode !== null && this.parentNode.nodeType === ELEMENT_NODE ? this.parentNode : null;
+	}
+
+	get isConnected() {
+		let node = this;
+		while (node.parentNode !== null) node = node.parentNode;
+		return node.nodeType === 9 || node === this.ownerDocument?.documentElement;
+	}
+
+	get firstChild() {
+		return this.childNodes.length === 0 ? null : this.childNodes[0];
+	}
+
+	get lastChild() {
+		return this.childNodes.length === 0 ? null : this.childNodes[this.childNodes.length - 1];
+	}
+
+	get nextSibling() {
+		if (this.parentNode === null) return null;
+		const siblings = this.parentNode.childNodes;
+		return siblings[siblings.indexOf(this) + 1] ?? null;
+	}
+
+	append(...children) {
+		for (const child of children) this.insertBefore(child, null);
+	}
+
+	insertBefore(child, reference) {
+		if (child.parentNode !== null) child.parentNode.childNodes.splice(child.parentNode.childNodes.indexOf(child), 1);
+		const index = reference === null || reference === undefined ? this.childNodes.length : this.childNodes.indexOf(reference);
+		this.childNodes.splice(index === -1 ? this.childNodes.length : index, 0, child);
+		child.parentNode = this;
+		this.ownerDocument?.record({ type: 'childList', target: this, addedNodes: [child], removedNodes: [] });
+		return child;
+	}
+
+	remove() {
+		if (this.parentNode === null) return;
+		const parent = this.parentNode;
+		parent.childNodes.splice(parent.childNodes.indexOf(this), 1);
+		this.parentNode = null;
+		parent.ownerDocument?.record({ type: 'childList', target: parent, addedNodes: [], removedNodes: [this] });
+	}
+
+	/** Replace every child in one go, the way the bar swaps its modes. */
+	replaceChildren(...children) {
+		for (const child of this.childNodes.slice()) child.parentNode = null;
+		this.childNodes.length = 0;
+		for (const child of children) {
+			if (child === null || child === undefined) continue;
+			this.append(child);
+		}
+	}
+
+	contains(node) {
+		let current = node;
+		while (current !== null && current !== undefined) {
+			if (current === this) return true;
+			current = current.parentNode;
+		}
+		return false;
+	}
+}
+
+class ShimText extends ShimNode {
+	constructor(document, value) {
+		super(TEXT_NODE);
+		this.nodeValue = value;
+		this.ownerDocument = document;
+	}
+
+	get textContent() {
+		return this.nodeValue;
+	}
+
+	set textContent(value) {
+		this.nodeValue = String(value);
+		this.ownerDocument?.record({ type: 'characterData', target: this });
+	}
+}
+
+/** A document fragment: children only, like the browser's `cloneContents()`. */
+class ShimFragment extends ShimNode {
+	constructor(document) {
+		super(DOCUMENT_FRAGMENT_NODE);
+		this.ownerDocument = document;
+	}
+}
+
+class ShimElement extends ShimNode {
+	constructor(document, tagName) {
+		super(ELEMENT_NODE);
+		this.ownerDocument = document;
+		this.tagName = String(tagName).toUpperCase();
+		this.attributes = new Map();
+		this.listeners = new Map();
+		this.style = {
+			display: '',
+			props: new Map(),
+			setProperty(name, value) {
+				this.props.set(String(name), String(value));
+			},
+			getPropertyValue(name) {
+				return this.props.get(String(name)) ?? '';
+			},
+			removeProperty: (name) => {
+				if (name === 'display') this.style.display = '';
+				this.style.props.delete(String(name));
+			},
+		};
+		/** Overridable so tests can place an element inside a fake viewport. */
+		this.rect = null;
+		const attributes = this.attributes;
+		this.dataset = new Proxy(
+			{},
+			{
+				get: (_, key) => attributes.get('data-' + String(key)),
+				set: (_, key, value) => {
+					attributes.set('data-' + String(key), String(value));
+					return true;
+				},
+				has: (_, key) => attributes.has('data-' + String(key)),
+			},
+		);
+	}
+
+	get className() {
+		return this.attributes.get('class') ?? '';
+	}
+
+	set className(value) {
+		this.attributes.set('class', String(value));
+	}
+
+	get textContent() {
+		return this.childNodes.map((child) => child.textContent).join('');
+	}
+
+	set textContent(value) {
+		for (const child of this.childNodes.slice()) child.parentNode = null;
+		this.childNodes.length = 0;
+		if (value !== '') this.append(new ShimText(this.ownerDocument, String(value)));
+	}
+
+	get innerHTML() {
+		return this.textContent;
+	}
+
+	set innerHTML(value) {
+		this.textContent = value;
+	}
+
+	getAttribute(name) {
+		return this.attributes.has(name) ? this.attributes.get(name) : null;
+	}
+
+	hasAttribute(name) {
+		return this.attributes.has(name);
+	}
+
+	setAttribute(name, value) {
+		this.attributes.set(name, String(value));
+	}
+
+	removeAttribute(name) {
+		this.attributes.delete(name);
+	}
+
+	// Reflected the way the real DOM reflects it, so the virtualizer can hide a
+	// row with either `row.hidden = true` or the attribute.
+	get hidden() {
+		return this.attributes.has('hidden');
+	}
+
+	set hidden(value) {
+		if (value === true || value === '') this.attributes.set('hidden', '');
+		else this.attributes.delete('hidden');
+	}
+
+	addEventListener(type, handler) {
+		const list = this.listeners.get(type) ?? [];
+		list.push(handler);
+		this.listeners.set(type, list);
+	}
+
+	removeEventListener(type, handler) {
+		const list = this.listeners.get(type) ?? [];
+		const index = list.indexOf(handler);
+		if (index !== -1) list.splice(index, 1);
+	}
+
+	dispatch(type, event) {
+		for (const handler of this.listeners.get(type) ?? []) handler(event);
+	}
+
+	dispatchEvent(event) {
+		this.dispatched = this.dispatched ?? [];
+		this.dispatched.push(event);
+		this.dispatch(event.type, event);
+		return true;
+	}
+
+	/** A zero box unless a test placed this element (`element.rect = {…}`). */
+	getBoundingClientRect() {
+		const rect = this.rect ?? { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+		return {
+			left: rect.left,
+			top: rect.top,
+			right: rect.right ?? rect.left + (rect.width ?? 0),
+			bottom: rect.bottom ?? rect.top + (rect.height ?? 0),
+			width: rect.width ?? 0,
+			height: rect.height ?? 0,
+		};
+	}
+
+	matches(selector) {
+		return matchesSelector(this, selector);
+	}
+
+	/** Enough of focus handling that a caller can see where the caret went. */
+	focus() {
+		if (this.ownerDocument !== undefined && this.ownerDocument !== null) this.ownerDocument.activeElement = this;
+	}
+
+	blur() {
+		if (this.ownerDocument !== undefined && this.ownerDocument !== null && this.ownerDocument.activeElement === this) {
+			this.ownerDocument.activeElement = null;
+		}
+	}
+
+	closest(selector) {
+		let node = this;
+		while (node !== null && node.nodeType === ELEMENT_NODE) {
+			if (matchesSelector(node, selector)) return node;
+			node = node.parentNode;
+		}
+		return null;
+	}
+
+	querySelector(selector) {
+		return this.querySelectorAll(selector)[0] ?? null;
+	}
+
+	querySelectorAll(selector) {
+		const found = [];
+		const walk = (node) => {
+			for (const child of node.childNodes) {
+				if (child.nodeType !== ELEMENT_NODE) continue;
+				if (matchesSelector(child, selector)) found.push(child);
+				walk(child);
+			}
+		};
+		walk(this);
+		return found;
+	}
+}
+
+function matchesSimple(element, part) {
+	if (part === '' || part === '*') return true;
+	const attribute = /^\[([\w-]+)(?:="([^"]*)")?\]$/.exec(part);
+	if (attribute !== null) {
+		const value = element.getAttribute(attribute[1]);
+		if (value === null) return false;
+		return attribute[2] === undefined || value === attribute[2];
+	}
+	const id = /^#([\w-]+)$/.exec(part);
+	if (id !== null) return element.getAttribute('id') === id[1];
+	const classes = part.split('.').filter((piece) => piece !== '');
+	if (classes.length > 1 || part.startsWith('.')) {
+		const names = element.className.split(/\s+/).filter((name) => name !== '');
+		return classes.every((name) => names.includes(name));
+	}
+	return element.tagName === part.toUpperCase();
+}
+
+function matchesSelector(element, selector) {
+	const chain = String(selector).trim().split(/\s+/).filter((piece) => piece !== '');
+	if (chain.length === 0) return false;
+	if (!matchesSimple(element, chain[chain.length - 1])) return false;
+	let node = element.parentNode;
+	let index = chain.length - 2;
+	while (index >= 0) {
+		let matched = false;
+		while (node !== null && node.nodeType === ELEMENT_NODE) {
+			if (matchesSimple(node, chain[index])) {
+				matched = true;
+				node = node.parentNode;
+				break;
+			}
+			node = node.parentNode;
+		}
+		if (!matched) return false;
+		index -= 1;
+	}
+	return true;
+}
+
+class ShimTreeWalker {
+	constructor(root, whatToShow, filter) {
+		this.filter = typeof filter === 'function' ? filter : null;
+		this.nodes = [];
+		this.collect(root);
+		this.index = -1;
+	}
+
+	collect(node) {
+		for (const child of node.childNodes) {
+			if (child.nodeType === TEXT_NODE) this.nodes.push(child);
+			else if (child.nodeType === ELEMENT_NODE) this.collect(child);
+		}
+	}
+
+	nextNode() {
+		while (this.index + 1 < this.nodes.length) {
+			this.index += 1;
+			const node = this.nodes[this.index];
+			const verdict = this.filter === null ? 1 : this.filter(node);
+			if (verdict === 1) return node;
+		}
+		return null;
+	}
+}
+
+/** A Range with no layout: offsets are real, rectangles are a fixed stub. */
+class ShimRange {
+	constructor() {
+		this.start = null;
+		this.end = null;
+	}
+
+	setStart(node, offset) {
+		this.start = { node, offset };
+	}
+
+	setEnd(node, offset) {
+		this.end = { node, offset };
+	}
+
+	getClientRects() {
+		return [{ left: 10, top: 20, right: 130, bottom: 36, width: 120, height: 16 }];
+	}
+}
+
+class ShimDocument extends ShimNode {
+	constructor() {
+		super(9);
+		this.ownerDocument = this;
+		this.mutations = [];
+		this.observers = [];
+		/** Document-level listeners (the bar's own are installed here). */
+		this.listeners = new Map();
+		/** Set by a test to hand `document.getSelection()` a live selection. */
+		this.selection = null;
+		/** Maintained by `ShimElement.focus()` / `blur()`. */
+		this.activeElement = null;
+		this.documentElement = new ShimElement(this, 'html');
+		this.head = new ShimElement(this, 'head');
+		this.body = new ShimElement(this, 'body');
+		this.documentElement.append(this.head);
+		this.documentElement.append(this.body);
+		this.childNodes.push(this.documentElement);
+		this.documentElement.parentNode = this;
+	}
+
+	record(mutation) {
+		if (this.observers.length > 0) this.mutations.push(mutation);
+	}
+
+	/** Hand pending mutations to every observer, the way the browser would. */
+	deliver() {
+		const records = this.mutations;
+		this.mutations = [];
+		if (records.length === 0) return 0;
+		for (const observer of this.observers) observer.callback(records);
+		return records.length;
+	}
+
+	createElement(tag) {
+		return new ShimElement(this, tag);
+	}
+
+	/**
+	 * A real range's `cloneContents()` hands back a fragment, not an element.
+	 * The harness offers one so the offline suite sees the same shape the
+	 * browser does — a fragment that only holds children.
+	 */
+	createDocumentFragment() {
+		return new ShimFragment(this);
+	}
+
+	createTextNode(value) {
+		return new ShimText(this, value);
+	}
+
+	createTreeWalker(root, whatToShow, filter) {
+		return new ShimTreeWalker(root, whatToShow, filter);
+	}
+
+	createRange() {
+		return new ShimRange();
+	}
+
+	getElementById(id) {
+		for (const element of this.documentElement.querySelectorAll('*')) {
+			if (element.getAttribute('id') === id) return element;
+		}
+		if (this.documentElement.getAttribute('id') === id) return this.documentElement;
+		return null;
+	}
+
+	querySelector(selector) {
+		if (matchesSelector(this.documentElement, selector)) return this.documentElement;
+		return this.documentElement.querySelector(selector);
+	}
+
+	querySelectorAll(selector) {
+		const found = this.documentElement.querySelectorAll(selector);
+		if (matchesSelector(this.documentElement, selector)) found.unshift(this.documentElement);
+		return found;
+	}
+
+	addEventListener(type, handler) {
+		// The bar's listeners are document singletons; the harness has to keep
+		// them so a test can drive a selection the way a browser would.
+		const list = this.listeners.get(type) ?? [];
+		list.push(handler);
+		this.listeners.set(type, list);
+	}
+
+	removeEventListener(type, handler) {
+		const list = this.listeners.get(type) ?? [];
+		const index = list.indexOf(handler);
+		if (index !== -1) list.splice(index, 1);
+	}
+
+	dispatch(type, event) {
+		for (const handler of [...(this.listeners.get(type) ?? [])]) handler(event);
+	}
+
+	getSelection() {
+		// A collapsed selection that can be cleared, which is all the bar asks of
+		// it — unless a test installs one with `document.selection = …`.
+		if (this.selection !== null && this.selection !== undefined) return this.selection;
+		return { isCollapsed: true, rangeCount: 0, removeAllRanges() {} };
+	}
+}
+
+class ShimMutationObserver {
+	constructor(callback) {
+		this.callback = callback;
+		this.target = null;
+	}
+
+	observe(target) {
+		this.target = target;
+		target.ownerDocument.observers.push(this);
+	}
+
+	disconnect() {
+		if (this.target === null) return;
+		const owner = this.target.ownerDocument;
+		const index = owner.observers.indexOf(this);
+		if (index !== -1) owner.observers.splice(index, 1);
+		this.target = null;
+	}
+}
+
+/** Create a fresh document plus the globals the bundle expects. */
+export function createDom() {
+	const document = new ShimDocument();
+	const clipboard = [];
+	const store = new Map();
+	// The plugin keeps the "side thread of this session" memory in localStorage,
+	// and reads better-sidebar's own map from there too.
+	const localStorage = {
+		getItem: (key) => (store.has(String(key)) ? store.get(String(key)) : null),
+		setItem: (key, value) => {
+			store.set(String(key), String(value));
+		},
+		removeItem: (key) => {
+			store.delete(String(key));
+		},
+		clear: () => {
+			store.clear();
+		},
+	};
+	return {
+		document,
+		Element: ShimElement,
+		MutationObserver: ShimMutationObserver,
+		// The draft bar removes a chip by dispatching Backspace at the editor;
+		// the harness only needs the constructor and the event's key fields.
+		KeyboardEvent: class ShimKeyboardEvent {
+			constructor(type, init) {
+				this.type = type;
+				Object.assign(this, init);
+			}
+		},
+		navigator: { clipboard: { writeText: (text) => clipboard.push(text) } },
+		getComputedStyle: () => ({ backgroundColor: 'rgb(20, 21, 24)' }),
+		window: { innerWidth: 1200, innerHeight: 800, addEventListener() {}, removeEventListener() {} },
+		clipboard,
+		localStorage,
+	};
+}
+
+export { ShimElement, ShimText };

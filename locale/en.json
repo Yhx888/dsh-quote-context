@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "title": "Chat quotes",
+    "description": "Select text in a message to quote or comment on it; quotes wait above the composer and become jumpable cards after sending."
+  },
+  "quote": "Quote",
+  "comment": "Comment",
+  "quoteLabel": "Quote",
+  "commentPlaceholder": "Add an optional comment…",
+  "addToChat": "Add to chat",
+  "cancel": "Cancel",
+  "confirm": "Add",
+  "dockTitle": "Quotes",
+  "dockCount": "{n}",
+  "dockClear": "Clear",
+  "edit": "Edit comment",
+  "save": "Save",
+  "remove": "Remove this quote",
+  "quoteMeta": "{lines} lines",
+  "sourceFrom": "Quoted from an earlier message",
+  "showSource": "Show in the original message",
+  "sourceLost": "The source has changed",
+  "jumpFailed": "The source is not in view right now",
+  "failed": "Could not do that, try again",
+  "commentEmpty": "Write a comment first",
+  "dockEditPlaceholder": "Write a comment…",
+  "quoteTooLong": "The quote was too long; cut to {n} characters",
+  "emptyQuote": "Nothing to quote",
+  "expand": "Expand",
+  "collapse": "Collapse"
+}
