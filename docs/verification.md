@@ -247,7 +247,12 @@ error: profile "desktop" is managed exclusively by the Electron application
 
 ## 9. 证据文件
 
-- `docs/screenshots/selection-bar.png` — P2 浮条
+- `docs/screenshots/01-selection.png` — 0.1.1 发布图：划词浮条
+- `docs/screenshots/02-comment.png` — 0.1.1 发布图：就地批注
+- `docs/screenshots/03-dock.png` — 0.1.1 发布图：常驻引用区
+- `docs/screenshots/04-message.png` — 0.1.1 发布图：发送后引用块
+- `docs/screenshots/05-dark.png` — 0.1.1 发布图：深色主题
+- `docs/screenshots/selection-bar.png` — P2 浮条（0.1.0 证据，已裁掉侧栏）
 - `docs/screenshots/quote-dock.png` — P3 引用区
 - `docs/screenshots/message-quote.png` — P4 消息内引用块
 - `docs/screenshots/dark-theme.png` — P5 深色（旧）
@@ -282,5 +287,15 @@ dsh --profile web --port 3942 --host 127.0.0.1 --no-open
   - `17619e0` fix: 评论批注改为可选并同步验证报告
   - `2aa05d0` fix: 对齐 DeepSeek 蓝与输入卡圆角，修复多引用 ref 泄漏
 - 工作区 clean（`git status --short` 为空）。
-- GitHub 推送：**未完成**。本机 `gh auth status` 报 token invalid，且直连/代理访问 `api.github.com` 均返回 EOF；已尝试 `gh repo create dsh-quote-context --public --source . --push` 失败。需要用户重新 `gh auth login` 或提供可用网络后再推送。
+- GitHub 推送：**已完成**（2026-10-27，`f25416c`）；release `v0.1.1` 已发布并附带 `dsh-quote-context-0.1.1.tgz`。
 - desktop profile：**未安装、未修改**，只做了文件级检查；实际安装/重启桌面端需先征得用户同意。
+
+## 12. 0.1.1 发布资产核验（2026-10-27）
+
+- `npm test`：manifest / exports / patch / locale / bundle / 线格式 / 消息引用卡全部 OK（`dsh-quote-context@0.1.1`）。
+- 隔离 web 实例（临时 `DSH_HOME`、端口 3941、演示工作区）用真实模型对话重新采集五张界面案例；Hero 与案例图均为 1600px 宽。
+- GitHub 仓库页加载检查：Hero、5 张案例、4 个 badge 的 `naturalWidth` 均正常，无坏图。
+- Release：https://github.com/Yhx888/dsh-quote-context/releases/tag/v0.1.1
+- 市场 PR：
+  - kejixiaoliang/awesome-dsh-plugins #167（UI / 皮肤 / 主题 → 界面增强）
+  - awesome-dsh-plugin/awesome-dsh-plugin #9871（category: ui）
