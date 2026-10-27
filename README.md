@@ -1,8 +1,31 @@
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="dsh-quote-context：在 DSH 里选中一句话，引用、批注，发送后仍能跳回原文" width="100%">
+</p>
+
 # dsh-quote-context
+
+[![release](https://img.shields.io/github/v/release/Yhx888/dsh-quote-context?style=flat-square&color=4D6BFE)](https://github.com/Yhx888/dsh-quote-context/releases)
+[![license](https://img.shields.io/badge/license-MIT-4D6BFE?style=flat-square)](LICENSE)
+[![dsh](https://img.shields.io/badge/DSH-%E2%89%A5%200.2.1--rc.3-4D6BFE?style=flat-square)](package.json)
+[![stars](https://img.shields.io/github/stars/Yhx888/dsh-quote-context?style=flat-square&color=4D6BFE)](https://github.com/Yhx888/dsh-quote-context)
 
 > 在 DSH 聊天里选中一段文字 → 引用或评论 → 引用进入输入卡上方的常驻引用区 → 发送后消息里出现「引用自先前的消息」引用块，可一键跳回原文并高亮。
 
+**中文** · [English](README.en.md)
+
 这是 [OpenChamber](https://github.com/openchamber/openchamber) 聊天引用模式的 DSH 原生复刻。视觉沿用 DSH 的输入卡、品牌蓝、发丝线、圆角与字号，不搬运 OpenChamber 的外观。
+
+## 界面
+
+| 01 · 划词即引 | 02 · 就地批注 |
+| --- | --- |
+| ![在消息正文里选中一句，浮出「引用 / 评论」](docs/screenshots/01-selection.png) | ![浮层内联成评论框，写一句批注](docs/screenshots/02-comment.png) |
+
+| 03 · 常驻引用区 | 04 · 发送后可跳回 |
+| --- | --- |
+| ![引用与批注停在输入卡上方，可编辑、可删除](docs/screenshots/03-dock.png) | ![消息内渲染引用块，点击回到原消息](docs/screenshots/04-message.png) |
+
+![深色主题：只使用 DSH 语义 CSS 变量，浅色与深色自动适配](docs/screenshots/05-dark.png)
 
 ## 特性
 
@@ -18,15 +41,29 @@
 
 要求 DSH `0.2.1-rc.3` 或兼容版本、Node ≥ 18。纯 Node 实现，无构建链。
 
-Web profile（开发/验证）：
+从 GitHub 安装：
 
 ```powershell
-dsh plugin --profile web add "link:C:/HOME/Project/DSH plugins/dsh-quote-context"
+dsh plugin --profile web add github:Yhx888/dsh-quote-context
 ```
 
-> 路径含空格时直接使用空格；本机 pnpm 11 会把 `%20` 当字面量目录，不要编码。
+从 Release tarball 安装：
 
-挂载后会通过包内 `cordis.patch.yml` 插入 `quote-context` Loader 行。桌面端 profile 由 Electron 独占管理，安装前先征询用户；本版只做文件级验证（见 `docs/verification.md`）。
+```powershell
+dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.1.1/dsh-quote-context-0.1.1.tgz
+```
+
+本地开发（link）：
+
+```powershell
+dsh plugin --profile web add "link:C:/path/to/dsh-quote-context"
+```
+
+> 路径含空格时直接使用空格；pnpm 11 会把 `%20` 当字面量目录，不要编码。
+
+桌面端：官方桌面端的 profile 由 Electron 独占管理，CLI 不直接写入；在应用内「插件」页从本仓库目录安装，或按 profile 的 pnpm 流程加入 `dsh.profile.bundles`。
+
+挂载后会通过包内 `cordis.patch.yml` 插入 `quote-context` Loader 行。验证记录见 [docs/verification.md](docs/verification.md)。
 
 ## 使用
 

@@ -1,6 +1,6 @@
 {
 	"name": "dsh-quote-context",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "聊天引用：选中消息文字即可引用或评论，引用常驻输入卡上方，发送后变成可跳回的引用块。",
 	"icon": "icon.svg",
 	"license": "MIT",
@@ -16,7 +16,7 @@
 	"type": "module",
 	"main": "lib/index.js",
 	"engines": {
-		"dsh": ">=0.2.0-rc.2",
+		"dsh": ">=0.2.1-rc.3",
 		"node": ">=18"
 	},
 	"publishConfig": {
@@ -36,6 +36,7 @@
 		"docs",
 		"cordis.patch.yml",
 		"README.md",
+		"README.en.md",
 		"CHANGELOG.md",
 		"LICENSE"
 	],
