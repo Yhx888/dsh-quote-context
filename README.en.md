@@ -26,6 +26,8 @@ A native DSH take on [OpenChamber](https://github.com/openchamber/openchamber)'s
 
 ![Dark theme — built on DSH semantic CSS variables](docs/screenshots/05-dark.png)
 
+Icon and screenshot art direction: [docs/design.md](docs/design.md).
+
 ## Features
 
 - **Selection bar**: select text in any message; **Quote** / **Comment** appears. Esc or an outside click dismisses it.

@@ -27,6 +27,8 @@
 
 ![深色主题：只使用 DSH 语义 CSS 变量，浅色与深色自动适配](docs/screenshots/05-dark.png)
 
+图标与截图规范见 [docs/design.md](docs/design.md)。
+
 ## 特性
 
 - **选区浮条**：在消息正文里选中文字，浮出「引用」「评论」两个动作；Esc 关闭，点击外部关闭。
