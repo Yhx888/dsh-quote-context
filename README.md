@@ -43,16 +43,16 @@
 
 要求 DSH `0.2.1-rc.3` 或兼容版本、Node ≥ 18。纯 Node 实现，无构建链。
 
-从 GitHub 安装：
-
-```powershell
-dsh plugin --profile web add github:Yhx888/dsh-quote-context
-```
-
-从 Release tarball 安装：
+从 Release tarball 安装（推荐）：
 
 ```powershell
 dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.1.1/dsh-quote-context-0.1.1.tgz
+```
+
+从 GitHub 源码安装（pnpm 11 默认拦截 git 依赖的构建脚本；如遇 `allowBuilds` 提示，按提示放行后再运行）：
+
+```powershell
+dsh plugin --profile web add github:Yhx888/dsh-quote-context
 ```
 
 本地开发（link）：

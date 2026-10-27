@@ -295,6 +295,7 @@ dsh --profile web --port 3942 --host 127.0.0.1 --no-open
 - `npm test`：manifest / exports / patch / locale / bundle / 线格式 / 消息引用卡全部 OK（`dsh-quote-context@0.1.1`）。
 - 隔离 web 实例（临时 `DSH_HOME`、端口 3941、演示工作区）用真实模型对话重新采集五张界面案例；Hero 与案例图均为 1600px 宽。
 - GitHub 仓库页加载检查：Hero、5 张案例、4 个 badge 的 `naturalWidth` 均正常，无坏图。
+- 安装实测：Release tarball 直装通过（临时 `DSH_HOME` + 临时 profile，pnpm 11.28.5，8.1s）；`github:` 直装被 pnpm 11 的 `allowBuilds` 拦截，README 已把 tarball 放在首选。
 - Release：https://github.com/Yhx888/dsh-quote-context/releases/tag/v0.1.1
 - 市场 PR：
   - kejixiaoliang/awesome-dsh-plugins #167（UI / 皮肤 / 主题 → 界面增强）

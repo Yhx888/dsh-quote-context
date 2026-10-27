@@ -42,13 +42,13 @@ Icon and screenshot art direction: [docs/design.md](docs/design.md).
 Requires DSH `0.2.1-rc.3` (or compatible) and Node ≥ 18. Plain Node, no build step.
 
 ```powershell
-dsh plugin --profile web add github:Yhx888/dsh-quote-context
+dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.1.1/dsh-quote-context-0.1.1.tgz
 ```
 
-Or install the release tarball:
+Or install from GitHub source (pnpm 11 blocks build scripts for git dependencies by default; if you see an `allowBuilds` prompt, allow it and re-run):
 
 ```powershell
-dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.1.1/dsh-quote-context-0.1.1.tgz
+dsh plugin --profile web add github:Yhx888/dsh-quote-context
 ```
 
 Local development:
