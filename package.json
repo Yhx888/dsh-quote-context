@@ -1,6 +1,6 @@
 {
 	"name": "dsh-quote-context",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "聊天引用：选中消息文字即可引用或评论；引用收在输入卡顶部的「聊天引用」芯片里，悬停展开预览，发送瞬间才进入消息正文，输入框里永远只有你自己的文字。",
 	"icon": "icon.svg",
 	"license": "MIT",

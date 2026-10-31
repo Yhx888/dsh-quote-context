@@ -58,7 +58,7 @@ Since 0.2.0 quotes live **outside the draft**:
 DSH `0.2.1-rc.3` or compatible, Node ≥ 18. Plain Node, no build step.
 
 ```powershell
-dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.2.1/dsh-quote-context-0.2.1.tgz
+dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.2.2/dsh-quote-context-0.2.2.tgz
 ```
 
 or from source:

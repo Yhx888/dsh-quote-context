@@ -1,6 +1,6 @@
 # 验证记录
 
-> 每一条都是可复核的证据：命令、环境、输出摘要。最后更新：2026-10-31（v0.2.1）。
+> 每一条都是可复核的证据：命令、环境、输出摘要。最后更新：2026-10-31（v0.2.2）。
 
 ## 环境
 
@@ -13,7 +13,7 @@
 
 ```
 $ npm test
-OK  manifest: dsh-quote-context@0.2.1
+OK  manifest: dsh-quote-context@0.2.2
 OK  exports : . ./client ./package.json ./locale/*.json
 OK  patch   : quote-context / dsh-quote-context
 OK  locale  : 37 keys (zh/en aligned)
