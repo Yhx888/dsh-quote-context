@@ -36,7 +36,7 @@ for (const key of Object.keys(zh)) {
 }
 
 const client = read('lib/client.js');
-for (const needle of ['conversation.input.overlay', 'quote-context.bridge', 'quoteBlock', 'splitQuoteRuns', 'SOURCE_NAME = "quote-context"', 'data-qctx', 'data-composer-chip=', '-webkit-line-clamp:4', 'text-overflow:ellipsis']) {
+for (const needle of ['conversation.input.overlay', 'quote-context.bridge', 'quoteBlock', 'splitQuoteRuns', 'composeOutgoing', 'DRAFT_MARKER', 'qctx-chip', 'qctx-panel', 'onSendKeyDownCapture', 'data-qctx', '-webkit-line-clamp:4', 'text-overflow:ellipsis']) {
 	if (!client.includes(needle)) throw new Error('client bundle 缺特征: ' + needle);
 }
 if (client.includes('@deepseek-ai/dsh-client-runtime')) throw new Error('client 不应依赖 dsh-client-runtime');

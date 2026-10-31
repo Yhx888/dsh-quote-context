@@ -42,9 +42,23 @@ const trailingText = trailingSegments.find((segment) => segment.type === 'text')
 if (trailingQuote === undefined || trailingQuote.quote !== '原文') throw new Error('ref 行后正文: 引用段丢失');
 if (trailingText === undefined || trailingText.text !== '用户正文') throw new Error('ref 行后正文: 用户正文丢失');
 
-// 6. 芯片载荷前后留空行，正文才会与 ※ 行分开
-const payload = t.chipPayloadForRef(t.encodeRef({ v: 1, s: 's', i: 'i', t: '正文', c: '', a: null }));
-if (!payload.startsWith('\n> ❝ 正文') || !payload.endsWith('\n\n')) throw new Error('芯片载荷空行不正确: ' + JSON.stringify(payload));
+// 6. 发送瞬间的折叠：引用块在前、用户正文在后，中间空一行
+const item = { id: 'qc-1', text: '正文', comment: '批注', anchor: null };
+const folded = t.composeOutgoing('s1', '我的问题', [item]);
+if (!folded.startsWith('> ❝ 正文\n> ❞ 批注\n> ※ │qc1:')) throw new Error('折叠后引用块不在最前: ' + JSON.stringify(folded));
+if (!folded.endsWith('\n\n我的问题')) throw new Error('折叠后用户正文没接在引用块后面: ' + JSON.stringify(folded));
+const foldedRef = folded.split('> ※ │')[1].split('\n')[0];
+eq(t.decodeRef(foldedRef), { v: 1, s: 's1', i: 'qc-1', t: '正文', c: '批注', a: null }, '折叠坐标可回读');
+
+// 6b. 只有引用、没有正文：不留尾随空格；零宽标记必须被剔除
+const onlyQuotes = t.composeOutgoing('s1', '\u200B', [item]);
+if (onlyQuotes !== t.quoteBlock('正文', '批注', t.encodeRef({ v: 1, s: 's1', i: 'qc-1', t: '正文', c: '批注', a: null }))) throw new Error('纯引用折叠不正确: ' + JSON.stringify(onlyQuotes));
+eq(t.stripMarker('\u200B用户\u200B正文'), '用户正文', '零宽标记剔除');
+
+// 6c. 多条引用按顺序折叠
+const many = t.composeOutgoing('s1', '问题', [item, { id: 'qc-2', text: '第二段', comment: '', anchor: null }]);
+if (many.indexOf('> ❝ 正文') > many.indexOf('> ❝ 第二段')) throw new Error('多条引用顺序不对');
+if (!many.endsWith('\n\n问题')) throw new Error('多条引用后用户正文丢失');
 
 // 7. 单行截断/空白折叠
 eq(t.normalizeLabel('  引用\n 文字  '), '引用 文字', '空白折叠');

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "聊天引用",
-    "description": "选中消息文字即可引用或评论；引用常驻输入卡上方，发送后变成可跳回的引用块。"
+    "description": "选中消息文字即可引用或评论；引用收在输入卡顶部的「聊天引用」芯片里，悬停展开，发送瞬间才进入消息正文。"
   },
   "quote": "引用",
   "comment": "评论",
@@ -27,5 +27,16 @@
   "quoteTooLong": "引用太长，已截断到 {n} 字",
   "emptyQuote": "没有可引用的文字",
   "expand": "展开",
-  "collapse": "收起"
+  "collapse": "收起",
+  "chipLabel": "聊天引用",
+  "chipTitle": "聊天引用 · {n} 条",
+  "selectedText": "所选文本",
+  "userComment": "用户评论",
+  "addComment": "添加评论…",
+  "editComment": "编辑评论",
+  "saveComment": "保存评论",
+  "cancelEdit": "取消编辑",
+  "clearAll": "清空",
+  "commandQuotes": "命令消息不附带引用，引用会留在输入卡上",
+  "foldFailed": "引用没能折进消息，已退回输入卡"
 }

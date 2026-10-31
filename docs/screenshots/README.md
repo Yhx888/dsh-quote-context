@@ -1,18 +1,17 @@
-# 截图资产
+# 截图
 
-## 当前发布用图（2026-10-27）
+## v0.2.0（当前）
 
 | 文件 | 内容 |
 | --- | --- |
-| `hero.png` | 1600×900 发布主图：图标、主张、真实界面引用区 |
-| `01-selection.png` | 划词浮条：选中一句，浮出「引用 / 评论」 |
-| `02-comment.png` | 就地批注：浮层内联评论框 |
-| `03-dock.png` | 常驻引用区：序号、原文、批注、编辑/删除 |
-| `04-message.png` | 发送后的引用块与「在原消息中显示」 |
-| `05-dark.png` | 深色主题下的引用块 |
+| `01-chip.png` | 收起态：输入卡顶部一行「聊天引用 1」 |
+| `02-panel.png` | 悬停展开：序号、引用自先前的消息、所选文本、用户评论、清空 |
+| `03-panel-dark.png` | 深色主题下的同一浮层 |
+| `04-sent.png` | 发送后：信使式引用卡（左侧竖线 + 4 行折叠原文 + 批注） |
+| `05-sent-dark.png` | 深色主题下已发送的引用 |
 
-这些图来自隔离 DSH 实例（临时 `DSH_HOME`、独立端口、演示工作区），用真实模型对话采集，侧栏与文件名均为演示内容，不含个人工作区。
+采集：隔离 `DSH_HOME`（`_shots/home`，profile `shots`）+ 真实模型对话，1440×900 @2x。
 
-## 旧版验证证据
+## v0.1.x（历史，旧版常驻引用区与输入框内芯片）
 
-`selection-bar.png`、`quote-dock.png`、`message-quote.png`、`multi-quote-real.png`、`design-light.png`、`design-dark.png`、`dark-theme.png`、`final-e2e.png`、`p1-page.png` 是 0.1.0 开发期的页面证据，已在 0.1.1 裁掉左侧栏（去掉个人工作区名称），保留作 [verification.md](../verification.md) 的对照。
+`hero.png`、`01-selection.png`、`02-comment.png`、`03-dock.png`、`04-message.png`、`05-dark.png`、`dark-theme.png`、`design-light.png`、`design-dark.png`、`final-e2e.png`、`message-quote.png`、`multi-quote-real.png`、`quote-dock.png`、`selection-bar.png`、`p1-page.png`。仅作历史对照，不再被 README 引用。

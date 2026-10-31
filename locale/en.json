@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Chat quotes",
-    "description": "Select text in a message to quote or comment on it; quotes wait above the composer and become jumpable cards after sending."
+    "description": "Select text in a message to quote or comment; quotes wait in a Chat quotes chip on the composer and only enter the message when you send."
   },
   "quote": "Quote",
   "comment": "Comment",
@@ -27,5 +27,16 @@
   "quoteTooLong": "The quote was too long; cut to {n} characters",
   "emptyQuote": "Nothing to quote",
   "expand": "Expand",
-  "collapse": "Collapse"
+  "collapse": "Collapse",
+  "chipLabel": "Chat quotes",
+  "chipTitle": "Chat quotes · {n}",
+  "selectedText": "Selected text",
+  "userComment": "Your comment",
+  "addComment": "Add a comment…",
+  "editComment": "Edit comment",
+  "saveComment": "Save comment",
+  "cancelEdit": "Cancel edit",
+  "clearAll": "Clear",
+  "commandQuotes": "A command message carries no quotes; they stay on the composer",
+  "foldFailed": "The quotes could not fold into the message; they are back on the composer"
 }

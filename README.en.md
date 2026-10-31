@@ -1,82 +1,107 @@
-<p align="center">
-  <img src="docs/screenshots/hero.png" alt="dsh-quote-context: quote a sentence, annotate it, and jump back to it later" width="100%">
-</p>
-
 # dsh-quote-context
 
 [![release](https://img.shields.io/github/v/release/Yhx888/dsh-quote-context?style=flat-square&color=4D6BFE)](https://github.com/Yhx888/dsh-quote-context/releases)
 [![license](https://img.shields.io/badge/license-MIT-4D6BFE?style=flat-square)](LICENSE)
-[![dsh](https://img.shields.io/badge/DSH-%E2%89%A5%200.2.1--rc.3-4D6BFE?style=flat-square)](package.json)
+[![dsh](https://img.shields.io/badge/dsh-%E2%89%A5%200.2.1--rc.3-4D6BFE?style=flat-square)](package.json)
 
-> Select text in a DSH message → quote or comment → the quote waits in a dock above the composer → after sending, the message carries a “quoted from an earlier message” card that jumps back to the source and highlights it.
+<p align="center">
+  <img src="docs/screenshots/02-panel.png" alt="A Chat quotes chip on the composer, expanded into selected text and your comments" width="100%">
+</p>
+
+> Select text in a DSH chat → quote or comment on it → the quote waits in a **Chat quotes N** chip at the top of the composer; hover or click to expand the preview, edit comments, remove items — and only the send gesture folds the quote block into the message.
 
 [中文](README.md) · **English**
 
-A native DSH take on [OpenChamber](https://github.com/openchamber/openchamber)'s chat-quote pattern. It borrows DSH's composer card, brand blue, hairline borders, radii and type scale — not OpenChamber's skin.
+The interaction follows [OpenChamber](https://github.com/openchamber/openchamber)'s chat-quote pattern (chip + stacked hover preview); the visual language borrows DSH's own composer, semantic tokens, hairlines and radii.
 
 ## Screens
 
-| 01 · Quote on selection | 02 · Comment in place |
+| 01 · Collapsed | 02 · Expanded |
 | --- | --- |
-| ![Selecting a sentence reveals Quote / Comment](docs/screenshots/01-selection.png) | ![The inline comment box](docs/screenshots/02-comment.png) |
+| ![Only one Chat quotes chip on the composer](docs/screenshots/01-chip.png) | ![The preview lists each quote with its selected text and your comment](docs/screenshots/02-panel.png) |
 
-| 03 · Persistent quote dock | 04 · Jump back after sending |
+| 03 · Dark | 04 · After sending |
 | --- | --- |
-| ![Quotes wait above the composer](docs/screenshots/03-dock.png) | ![Quote cards inside the sent message](docs/screenshots/04-message.png) |
+| ![Chip and preview in the dark theme](docs/screenshots/03-panel-dark.png) | ![The sent message renders a jumpable reply-style quote](docs/screenshots/04-sent.png) |
 
-![Dark theme — built on DSH semantic CSS variables](docs/screenshots/05-dark.png)
+![Sent quote in the dark theme](docs/screenshots/05-sent-dark.png)
 
-Icon and screenshot art direction: [docs/design.md](docs/design.md).
+## Why quotes stay out of the composer
+
+0.1.x inserted a native reference chip per quote into the composer. It was hidden with CSS, but it still **occupied a position in the draft's text flow**:
+
+- Backspace/Delete in the composer selected the chip first and then removed it — the quote disappeared with it;
+- typing into the text ran into the invisible chip;
+- undo, select-all and session switches all carried the chip along.
+
+Since 0.2.0 quotes live **outside the draft**:
+
+- the composer only shows one **Chat quotes N** chip — composer chrome, not editable text;
+- the delete key can only delete your own words;
+- at the send gesture (Enter, Ctrl/⌘+Enter, the send button) the quote block is folded into the outgoing text and handed to the host's own send path — delivery mode, attachments and optimistic echo are unchanged;
+- if the host rejects the send, your text comes back and the quotes return to the chip.
 
 ## Features
 
-- **Selection bar**: select text in any message; **Quote** / **Comment** appears. Esc or an outside click dismisses it.
-- **Comment**: inline textarea, Enter to submit, Shift+Enter for a newline; the quote and comment enter the dock together.
-- **Quote dock**: a persistent list above the composer (inserted before `[data-composer-card]`, so the composer never changes size). Each row = index + one-line source + comment + edit/remove; indices renumber after removal; clear-all is supported.
-- **Quote card after sending**: “Quoted from an earlier message” + source (4 lines folded by default) + comment + **Show in the original message**; the source scrolls into view and is highlighted.
-- **Survives reloads**: quote coordinates travel inside the message text, so a reloaded session still parses and jumps.
-- **Light / dark**: only DSH semantic CSS variables (`--dsw-alias-*`); no second palette.
+- **Selection bar**: select text in a message to get Quote and Comment; Escape or an outside click closes it.
+- **Comments**: an inline textarea in the bar, Enter submits, Shift+Enter adds a line.
+- **Collapsible chip**: one 28px chip at the top of the composer (bubble icon + count); it disappears when there are no quotes and the composer shrinks back.
+- **Preview popover**: opens on hover, pins on click; each row = index + "Quoted from an earlier message" + Selected text (click to jump back and highlight) + Your comment (edit in place, Enter saves) + remove; a Clear footer appears with two or more.
+- **Fresh preview**: a newly added quote opens the popover for ~2.4s and highlights that row, then it closes unless hovered or pinned.
+- **Send folding**: quotes first, your text after, same wire format; command messages (starting with /) carry no quotes and say so.
+- **Sent quote block**: rendered as a reply — a hairline bar, the source caption, the quote (clamped to 4 lines, click to expand) and your comment as normal text; "Show in the original message" scrolls back and flashes the source.
+- **Readable after refresh**: coordinates travel in the message text, so a reloaded session still parses and jumps.
+- **Light and dark**: DSH semantic variables only (`--dsw-alias-*`, `--dsw-elevation-*`, `--dsw-specific-input-major`).
 
 ## Install
 
-Requires DSH `0.2.1-rc.3` (or compatible) and Node ≥ 18. Plain Node, no build step.
+DSH `0.2.1-rc.3` or compatible, Node ≥ 18. Plain Node, no build step.
 
 ```powershell
-dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.1.1/dsh-quote-context-0.1.1.tgz
+dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.2.0/dsh-quote-context-0.2.0.tgz
 ```
 
-Or install from GitHub source (pnpm 11 blocks build scripts for git dependencies by default; if you see an `allowBuilds` prompt, allow it and re-run):
+or from source:
 
 ```powershell
 dsh plugin --profile web add github:Yhx888/dsh-quote-context
 ```
 
-Local development:
+Local development (link):
 
 ```powershell
 dsh plugin --profile web add "link:C:/path/to/dsh-quote-context"
 ```
 
-Desktop: the official desktop profile is managed by Electron; install the repository folder from the in-app Plugins page (or add it to `dsh.profile.bundles` through the profile's pnpm flow).
+Desktop: the Electron app owns `profiles/desktop`; install from the plugin page or through the profile's pnpm flow and add the package to `dsh.profile.bundles`.
+
+## Usage
+
+1. Select text in any user or assistant message.
+2. Quote adds it straight away; Comment asks for an optional note first.
+3. The composer shows Chat quotes N. Hover or click: read each quote, edit its comment, remove it, or clear all.
+4. Type your question as usual — the composer only holds your words.
+5. Send: the quote blocks travel with your text and render as jumpable quote cards in the message.
 
 ## Wire format
 
-DSH messages are plain text. On send, the quote source expands each quote into:
-
 ```text
-> ❝ first source line
-> second source line
-> ❞ first comment line
+> ❝ first line of the quote
+> second line
+> ❞ first line of the comment
+> second line
 > ※ │qc1:<base64url(JSON)>
 ```
 
-The `※` line is the transport coordinate (stripped by the UI, still readable to the model). A failed parse keeps the text as-is and never blocks the send.
+- The `❞` section is omitted without a comment; the `※` line carries coordinates, is stripped in the UI and stays readable to the model.
+- The JSON holds `{v,s,i,t,c,a}`: version, session, quote id, text, comment, anchor (row key / ordinal / context).
+- Unparseable content stays plain text and never blocks sending.
 
 ## Compatibility
 
-- Target: DSH `0.2.1-rc.3` web client. DOM contract: `[data-conversation-content]`, `[data-conversation-session]`, `[data-chat-anchor-key]`, `[data-composer-card]`, `[data-composer-input]`.
-- Host services: `slots`, `locale`, `conversation.input` (quote chip), `inputTriggers` (send-time codec). If one is missing the action reports a failure instead of writing a half quote.
-- Does not share triggers/sources with the built-in `@` reference or `dsh-quote-deck`; both compete for the selection bar, so pick one.
+- Target: DSH `0.2.1-rc.5` web client; DOM contract: `[data-conversation-content]`, `[data-conversation-session]`, `[data-chat-anchor-key]`, `[data-chat-node-key]`, `[data-composer-card]`, `[data-composer-input]`, `[data-conversation-scroll]`.
+- Host services: `slots`, `locale`, `conversation.input.shell()` (read/write the draft). 0.2.0 no longer registers an `inputTriggers` source and never inserts chips.
+- Does not share a source/trigger with the built-in `@` references or `dsh-quote-deck`; both claim the selection bar, so install one.
 
 ## Development
 
@@ -85,6 +110,10 @@ node --check lib/client.js
 npm test
 ```
 
+## Verification
+
+See [docs/verification.md](docs/verification.md) for the isolated-instance run: quote → hammer Delete in the composer → send → reload, plus light and dark captures.
+
 ## License
 
-MIT. Selection handling, wire format and the DOM test shim are reused from [dsh-quote-deck](https://github.com/YHX/dsh-quote-deck) (MIT, forked from `dsh-client-ui-quote`); interaction references [OpenChamber](https://github.com/openchamber/openchamber).
+MIT. Wire format, selection bar and the DOM test shim reuse verified work from [dsh-quote-deck](https://github.com/YHX/dsh-quote-deck) (MIT, forked from `dsh-client-ui-quote`); interaction follows [OpenChamber](https://github.com/openchamber/openchamber).
