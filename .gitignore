@@ -3,3 +3,4 @@ _tmp/
 _shots/
 *.log
 .DS_Store
+.local/

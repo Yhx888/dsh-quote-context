@@ -60,7 +60,7 @@
 从 Release tarball 安装（推荐）：
 
 ```powershell
-dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.2.0/dsh-quote-context-0.2.0.tgz
+dsh plugin --profile web add https://github.com/Yhx888/dsh-quote-context/releases/download/v0.2.1/dsh-quote-context-0.2.1.tgz
 ```
 
 从 GitHub 源码安装：
