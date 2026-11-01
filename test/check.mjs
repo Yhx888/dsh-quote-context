@@ -41,6 +41,27 @@ for (const needle of ['conversation.input.overlay', 'quote-context.bridge', 'quo
 }
 if (client.includes('@deepseek-ai/dsh-client-runtime')) throw new Error('client 不应依赖 dsh-client-runtime');
 
+// 样式表完整性：每条 CSS 条目必须括号平衡、不能有游离声明（0.2.3 曾因一条规则提前闭合，
+// 把后面的 .qctx-chip 规则整个吞掉，芯片退回浏览器默认按钮样式）。
+{
+	const styleStart = client.indexOf('const STYLE_TEXT = [');
+	const styleEnd = client.indexOf('].join("\\n");', styleStart);
+	if (styleStart < 0 || styleEnd < 0) throw new Error('找不到 STYLE_TEXT 样式块');
+	const styleBlock = client.slice(styleStart, styleEnd);
+	const entries = [...styleBlock.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => JSON.parse('"' + m[1] + '"'));
+	if (entries.length < 40) throw new Error('样式条目过少: ' + entries.length);
+	for (const entry of entries) {
+		const open = (entry.match(/{/g) || []).length;
+		const close = (entry.match(/}/g) || []).length;
+		if (open !== close) throw new Error('CSS 括号不平衡: ' + entry.slice(0, 80));
+		if (/^[a-z-]+\s*:/.test(entry)) throw new Error('CSS 出现游离声明: ' + entry.slice(0, 80));
+	}
+	const css = entries.join('\n');
+	for (const selector of ['.qctx-chip{', '.qctx-anchor{', '.qctx-panel{', '.qctx-quote-card{']) {
+		if (!css.includes(selector)) throw new Error('样式表缺规则: ' + selector);
+	}
+}
+
 const loaded = loadClient();
 if (loaded.exports.inject.join(',') !== 'slots,locale') throw new Error('client inject 必须是 slots,locale');
 if (loaded.exports.__testing.quoteBlock('正文') !== '> ❝ 正文') throw new Error('quoteBlock 契约失败');
