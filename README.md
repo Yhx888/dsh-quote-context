@@ -102,7 +102,8 @@ dsh plugin --profile web add "link:C:/path/to/dsh-quote-context"
 ```
 
 - 无批注时省略 `❞` 段；`※` 行是传输坐标，界面渲染时剥离，模型仍可读。
-- 坐标 JSON 含 `{v,s,i,t,c,a}`：版本、会话、引用 id、原文、批注、锚点（行键/同文本序号/前后文）。
+- 坐标 JSON 为 `{v,s,i,a}`：版本、会话、引用 id、锚点（行键 / 节点键 / 轮次 / 同文本序号 / 精确字符偏移 / 前后文各 16 字符）。原文与批注已由上方 `> ❝` / `> ❞` 明文行承载，坐标里不再重复编码。
+- 历史消息中的 `qc1:` 可能仍带 `t` / `c`（原文 / 批注）字段；`decodeRef` 接受并原样保留这些字段，旧会话可继续解析、跳回。
 - 解析失败时保持普通文本，不阻断发送。
 
 ## 兼容性
@@ -110,6 +111,7 @@ dsh plugin --profile web add "link:C:/path/to/dsh-quote-context"
 - 目标：DSH `0.2.1-rc.5` Web 客户端；DOM 契约包括 `[data-conversation-content]`、`[data-conversation-session]`、`[data-chat-anchor-key]`、`[data-chat-node-key]`、`[data-composer-card]`、`[data-composer-input]`、`[data-conversation-scroll]`。
 - 依赖的宿主服务：`slots`、`locale`、`conversation.input.shell()`（读写草稿）。0.2.0 不再注册 `inputTriggers` 引用源，也不再往草稿里插芯片。
 - 与内置 `@` 引用、`dsh-quote-deck` 不共享 source/trigger；如同时安装，注意两者都会争夺选区浮条，建议二选一。
+- 与 DSH 内置 `@deepseek-ai/dsh-message-quotes`（Loader Entry ID `message-quotes`）**不兼容**：它会同时弹出官方「引用文本」浮条，并用 `QuotePreview` 抢先渲染 `> ` 引用块，导致本插件的引用卡失效、`※ │qc1:` 坐标行裸露。因此包内 `cordis.patch.yml` 声明式禁用该内置条目；禁用随本插件 Bundle 生效，卸载后官方插件自动恢复。
 
 ## 开发
 

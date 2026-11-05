@@ -94,13 +94,15 @@ Desktop: the Electron app owns `profiles/desktop`; install from the plugin page 
 ```
 
 - The `❞` section is omitted without a comment; the `※` line carries coordinates, is stripped in the UI and stays readable to the model.
-- The JSON holds `{v,s,i,t,c,a}`: version, session, quote id, text, comment, anchor (row key / ordinal / context).
+- The JSON holds `{v,s,i,a}`: version, session, quote id, anchor (row key / node key / turn / ordinal / exact character offset / 16-char prefix & suffix). The quote text and comment already live in the `> ❝` / `> ❞` plain-text lines above, so the coordinate no longer duplicates them.
+- Older messages may still carry `t` / `c` (text / comment) in `qc1:`; `decodeRef` accepts and preserves them, so existing conversations keep parsing and jumping back.
 - Unparseable content stays plain text and never blocks sending.
 
 ## Compatibility
 
 - Target: DSH `0.2.1-rc.5` web client; DOM contract: `[data-conversation-content]`, `[data-conversation-session]`, `[data-chat-anchor-key]`, `[data-chat-node-key]`, `[data-composer-card]`, `[data-composer-input]`, `[data-conversation-scroll]`.
 - Host services: `slots`, `locale`, `conversation.input.shell()` (read/write the draft). 0.2.0 no longer registers an `inputTriggers` source and never inserts chips.
+- **Incompatible** with DSH's built-in `@deepseek-ai/dsh-message-quotes` (Loader Entry ID `message-quotes`): it shows its own "Quote text" bar and renders `> ` blockquotes via `QuotePreview` before this plugin can, which breaks the quote cards and exposes the raw `※ │qc1:` coordinate line. This package's `cordis.patch.yml` disables that entry declaratively; the override is active while this bundle is installed, and the built-in plugin is restored automatically on uninstall.
 - Does not share a source/trigger with the built-in `@` references or `dsh-quote-deck`; both claim the selection bar, so install one.
 
 ## Development
